@@ -6,15 +6,21 @@
  * @version (version number or date here)
  */
 public enum TipoNavio {
-    PORTA_AVIOES(5), NAVIO_TANQUE(4), CONTRATORPEDEIRO(3), SUBMARINO(2);
+    PORTA_AVIOES(5,1), CRUZADOR(4,2), DESTROIER(3,3), SUBMARINO(2,4);
     
     private int tamanho;
+    private int quantidade;
     
-    TipoNavio(int t) {
+    TipoNavio(int t, int q) {
         tamanho = t;
+        quantidade = q;
     }
     
     public int obtemTamanho() {
         return tamanho;
+    }
+
+    public int obtemQuantidade() {
+        return quantidade;
     }
 }

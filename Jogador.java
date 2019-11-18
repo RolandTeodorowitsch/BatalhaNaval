@@ -1,9 +1,9 @@
 /**
- * Classe para armazenar as informa&ccedil;&otilde;oes de
+ * Classe para armazenar as informa&ccedil;&otilde;es de
  * um jogador.
  *
  * @author Roland Teodorowitsch
- * @version 29 jun. 2019
+ * @version 18 nov. 2019
  */
 public class Jogador {
     private String nome;
