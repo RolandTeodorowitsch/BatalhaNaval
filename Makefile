@@ -31,8 +31,8 @@ add:
 
 commit:		add
 		@git commit -m "`date`"
-		# @git remote add origin https://github.com/RolandTeodorowitsch/BatalhaNaval.git
-		# @git push -u origin master
+#		@git remote add origin https://github.com/RolandTeodorowitsch/BatalhaNaval.git
+		@git push -u origin master
 
 clean:
 		@rm -f *.class *.ctxt
