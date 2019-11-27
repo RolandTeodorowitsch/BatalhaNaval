@@ -2,17 +2,19 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class BatalhaNaval {
-    private Jogador j1, j2;
-    private Tabuleiro t1, t2;
+    private Jogador[] jogadores;
+    private Tabuleiro[] tabuleiros;
     private int estado; // 0 = tabuleiros vazios; 1 = navios posicionados; 2 = jogadas; 3 = encerrado
     private Random gerador;
     private Scanner in;
     
     public BatalhaNaval(Jogador j1, Jogador j2) {
-        this.j1 = j1;
-        this.j2 = j2;
-        t1 = new Tabuleiro();
-        t2 = new Tabuleiro();
+        jogadores = new Jogador[2];
+        jogadores[0] = j1;
+        jogadores[1] = j2;
+        tabuleiros = new Tabuleiro[2];
+        tabuleiros[0] = new Tabuleiro();
+        tabuleiros[1] = new Tabuleiro();
         estado = 0;
         gerador = new Random();
         in = new Scanner(System.in);
@@ -89,15 +91,33 @@ public class BatalhaNaval {
         }
     }
 
+    private void executaTiroComputador(Tabuleiro tab, Jogador jog) {
+        int lin, col;
+        int numLinhas = tab.obtemNumLinhas(), numColunas = tab.obtemNumColunas();
+        
+        boolean res = false;
+        while (!res) {
+            lin = gerador.nextInt(numLinhas);
+            col = gerador.nextInt(numColunas);
+            res = tab.executaTiro(lin, col);
+            if (res) {
+                TipoCasa c = tab.obtem(lin, col);
+                if (c == TipoCasa.AGUA)
+                    System.out.printf("%s acertou na agua...\n",jog.obtemNome());
+                else if (c == TipoCasa.EXPLOSAO)
+                    System.out.printf("%s acertou algum navio...\n",jog.obtemNome());
+            }
+        }
+    }
+
     
     private void executaTiroUsuario(Tabuleiro tab, Jogador jog) {
         int lin, col;
         int numLinhas = tab.obtemNumLinhas(), numColunas = tab.obtemNumColunas();
-        boolean res;
         
         tab.imprimeParaAdversario();
         System.out.printf("%s, execute um tiro no tabuleiro do seu adversário!\n",jog.obtemNome());
-        res = false;
+        boolean res = false;
         while (!res) {
             System.out.print("Forneça coordenadas no formato linha[A-J]-coluna[0-9] (por exemplo \"B5\" ou \"C3\"): ");
             String entrada = in.next().toUpperCase();
@@ -111,29 +131,43 @@ public class BatalhaNaval {
                continue;
             res = tab.executaTiro(lin, col);
             if (res)
-               System.out.println("Tiro executado!");
+               System.out.println("Tiro executado!\n");
             else
                 System.out.println("Localizacao INVÁLIDA!");
         }
     }
 
     public void iniciar() {
-        if (j1.obtemTipo() == TipoJogador.COMPUTADOR)
-           posicionaNaviosComputador(t1);
-        else {
-           posicionaNaviosUsuario(t1,j1);
-           t1.imprime();
-        }
-        if (j2.obtemTipo() == TipoJogador.COMPUTADOR)
-           posicionaNaviosComputador(t2);
-        else {
-           posicionaNaviosUsuario(t2,j2);
-           t2.imprime();
-        }
+        for (int j=0; j<jogadores.length; ++j)
+            if (jogadores[j].obtemTipo() == TipoJogador.COMPUTADOR)
+                posicionaNaviosComputador(tabuleiros[j]);
+            else {
+                posicionaNaviosUsuario(tabuleiros[j],jogadores[j]);
+                tabuleiros[j].imprime();
+            }
         System.out.println("\nPOSICIONAMENTO CONCLUÍDO!\n");
         estado = 1;
-        for (int i=0; i<10; ++i)
-            executaTiroUsuario(t2,j1);
+        int jogador = 0;
+        boolean fim = false;
+        while (!fim) {
+            for (int j=0; j<jogadores.length; ++j) {
+                System.out.printf("%20s - frota destruida: %d de %d\n",jogadores[j].obtemNome(),
+                                                                        tabuleiros[j].obtemNumExplosoes(),
+                                                                        tabuleiros[j].obtemNumCasasOcupadas());
+            }
+            System.out.println();
+            int adversario = 1-jogador;
+            if (jogadores[jogador].obtemTipo() == TipoJogador.COMPUTADOR)
+                executaTiroComputador(tabuleiros[adversario],jogadores[jogador]);
+            else
+                executaTiroUsuario(tabuleiros[adversario],jogadores[jogador]);
+            if (tabuleiros[adversario].obtemNumCasasOcupadas() == tabuleiros[adversario].obtemNumExplosoes()) {
+                System.out.println(jogadores[jogador].obtemNome()+" venceu a partida!");
+                fim = true;
+            }
+            else
+                jogador = adversario;
+        }
     }
     
 }

@@ -27,6 +27,14 @@ public class Tabuleiro {
         return COLUNAS;
     }
     
+    public int obtemNumExplosoes() {
+        return numExplosoes;
+    }
+    
+    public int obtemNumCasasOcupadas() {
+        return numCasasOcupadas;
+    }
+    
     public void imprime() {
         String linha = " +-+-+-+-+-+-+-+-+-+-+";
         System.out.print("  ");
@@ -110,6 +118,13 @@ public class Tabuleiro {
         return true;
     }
 
+    public TipoCasa obtem(int lin, int col) {
+        if (lin < 0 || lin >= LINHAS || col < 0 || col >= COLUNAS)
+           return TipoCasa.VAZIO;
+        else
+           return tabuleiro[lin][col];
+    }
+    
     public boolean executaTiro(int lin, int col) {
         if (lin < 0 || lin >= LINHAS || col < 0 || col >= COLUNAS)
            return false;
