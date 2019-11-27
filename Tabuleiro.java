@@ -4,6 +4,8 @@ public class Tabuleiro {
     private final static int COLUNAS = 10;
     private TipoCasa[][] tabuleiro;
     private int[] numNavios;
+    private int numCasasOcupadas;
+    private int numExplosoes;
     
     public Tabuleiro() {
         tabuleiro = new TipoCasa[LINHAS][COLUNAS];
@@ -13,13 +15,23 @@ public class Tabuleiro {
         for (int i=0; i<LINHAS; ++i)
             for (int j=0; j<COLUNAS; ++j)
                 tabuleiro[i][j] = TipoCasa.VAZIO;
+        numCasasOcupadas = 0;
+        numExplosoes = 0;
     }
     
-    public void print() {
+    public int obtemNumLinhas() {
+        return LINHAS;
+    }
+    
+    public int obtemNumColunas() {
+        return COLUNAS;
+    }
+    
+    public void imprime() {
         String linha = " +-+-+-+-+-+-+-+-+-+-+";
         System.out.print("  ");
         for (int j=0; j<COLUNAS; ++j)
-            System.out.printf("%-2d",j+1);
+            System.out.printf("%-2d",j);
         System.out.println();
         for (int i=0; i<LINHAS; ++i) {
             System.out.println(linha);
@@ -29,6 +41,27 @@ public class Tabuleiro {
                     case OCUPADO:
                          System.out.print("#|");
                          break;
+                    default:
+                         System.out.print(" |");
+                         break;
+                }
+            }
+            System.out.println();
+        }
+        System.out.println(linha);
+    }
+    
+    public void imprimeParaAdversario() {
+        String linha = " +-+-+-+-+-+-+-+-+-+-+";
+        System.out.print("  ");
+        for (int j=0; j<COLUNAS; ++j)
+            System.out.printf("%-2d",j);
+        System.out.println();
+        for (int i=0; i<LINHAS; ++i) {
+            System.out.println(linha);
+            System.out.printf("%c|",'A'+i);
+            for (int j=0; j<COLUNAS; ++j) {
+                switch(tabuleiro[i][j]) {
                     case AGUA:
                          System.out.print(".|");
                          break;
@@ -52,7 +85,6 @@ public class Tabuleiro {
         int n = navio.ordinal();
         if ( numNavios[n] >= navio.obtemQuantidade() )
            return false;
-        numNavios[n]++;
         if (ori == TipoOrientacao.HORIZONTAL) {
             if (col+tamNav >= COLUNAS)
                return false;
@@ -73,7 +105,25 @@ public class Tabuleiro {
             for (int i=0; i<tamNav; ++i)
                 tabuleiro[lin+i][col] = TipoCasa.OCUPADO;
         }
+        numNavios[n]++;
+        numCasasOcupadas += tamNav;
         return true;
     }
-    
+
+    public boolean executaTiro(int lin, int col) {
+        if (lin < 0 || lin >= LINHAS || col < 0 || col >= COLUNAS)
+           return false;
+        switch(tabuleiro[lin][col]) {
+            case VAZIO:
+                 tabuleiro[lin][col] = TipoCasa.AGUA;
+                 return true;
+            case OCUPADO:
+                 tabuleiro[lin][col] = TipoCasa.EXPLOSAO;
+                 ++numExplosoes;
+                 return true;
+            default:
+        }
+        return false;
+    }
+
 }
